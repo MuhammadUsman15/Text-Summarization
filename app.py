@@ -3,8 +3,11 @@ from transformers import pipeline, AutoModelForCausalLM, AutoTokenizer
 
 app = Flask(__name__)
 
+model_name = "facebook/bart-base-cnn"  # Use a smaller model
 
-model_name = "facebook/bart-large-cnn"  
+# Load the model and tokenizer during application initialization
+model = AutoModelForCausalLM.from_pretrained(model_name)
+tokenizer = AutoTokenizer.from_pretrained(model_name)
 
 @app.route('/')
 def index():
@@ -13,14 +16,10 @@ def index():
 @app.route('/summarize', methods=['POST'])
 def summarize():
     text = request.form['text']
-    max_length = int(request.form['max_length'])  # Retrieve max_length from the form
-    min_length = int(request.form['min_length'])  # Retrieve min_length from the form
+    max_length = int(request.form['max_length'])
+    min_length = int(request.form['min_length'])
 
-    # Load the selected model and tokenizer
-    model = AutoModelForCausalLM.from_pretrained(model_name)
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
-
-    # Create a summarization pipeline with the selected model and tokenizer
+    # Create a summarization pipeline with the loaded model and tokenizer
     summarizer = pipeline("summarization", model=model, tokenizer=tokenizer)
     summary = summarizer(text, max_length=max_length, min_length=min_length, do_sample=False)
 
