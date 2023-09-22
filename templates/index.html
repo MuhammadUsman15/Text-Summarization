@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Summarizer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        form {
+            background-color: #fff;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        input[type="submit"] {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        h2 {
+            text-align: center;
+            margin-top: 20px;
+            color: #333;
+        }
+
+        #summary {
+            background-color: #fff;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Text Summarizer</h1>
+    <form action="/summarize" method="POST">
+        <label for="text">Enter text to summarize:</label>
+        <textarea name="text" rows="10" cols="40" id="text" placeholder="Enter text to summarize"></textarea>
+        <br>
+        <label for="max_length">Maximum Summary Length:</label>
+        <input type="number" name="max_length" id="max_length" value="150" min="1">
+        <br>
+        <label for="min_length">Minimum Summary Length:</label>
+        <input type="number" name="min_length" id="min_length" value="30" min="1">
+        <br>
+        <input type="submit" value="Summarize" id="submitBtn">
+        
+    </form>
+    <h2>Summary:</h2>
+    <div id="loading" style="display: none;">
+        <img src="templates\loading.gif" alt="Loading..." width="30" height="30">
+    </div>
+    <p id="summary"></p>
+
+    <script>
+        document.querySelector('form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const text = document.querySelector('#text').value;
+    const max_length = document.querySelector('#max_length').value;
+    const min_length = document.querySelector('#min_length').value;
+
+    // Show the loading spinner
+    document.querySelector('#loading').style.display = 'block';
+
+    const formData = new URLSearchParams();
+    formData.append('text', text);
+    formData.append('max_length', max_length);
+    formData.append('min_length', min_length);
+
+    const response = await fetch('/summarize', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: formData,
+    });
+
+    const data = await response.json();
+
+    // Hide the loading spinner
+    document.querySelector('#loading').style.display = 'none';
+
+    document.querySelector('#summary').textContent = data.summary;
+});
+
+    </script>
+</body>
+</html>
